@@ -171,8 +171,8 @@ function appendToFormData(
 
 export function chromiumUrl(
   url: string,
-  options: Partial<ChromiumOptions>,
-  files: Asset[]
+  options: Partial<ChromiumOptions> = {},
+  files: Asset[] = []
 ): RequestInfo {
   const data = new FormData();
 
@@ -273,7 +273,7 @@ export function executor(url: string, headers: Partial<headers> = {}) {
     return fetch(reqUrl, {
       body: info.data,
       headers: {
-        "Content-Type": "multipart/form-data",
+        // "Content-Type": "multipart/form-data",
         ...extraHeaders,
       },
       method: "POST",
@@ -314,7 +314,7 @@ export function webhookExecutor(
     return fetch(reqUrl, {
       body: info.data,
       headers: {
-        "Content-Type": "multipart/form-data",
+        // "Content-Type": "multipart/form-data",
         ...extraHeaders,
       },
       method: "POST",
@@ -322,17 +322,14 @@ export function webhookExecutor(
   };
 }
 
-export async function readFile(file: string, filename = ''): Promise<Asset> {
-  if(!filename) filename = file
+export async function readFile(file: string, filename = ""): Promise<Asset> {
+  if (!filename) filename = file;
 
   return {
     filename,
-    content: new Blob([await Deno.readFile(file)])
-  }
+    content: new Blob([await Deno.readFile(file)]),
+  };
 }
-
-
-
 
 // export function handleZipResponse(r: Response): any[] {
 //   return [];
