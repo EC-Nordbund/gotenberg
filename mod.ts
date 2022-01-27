@@ -246,6 +246,19 @@ export function merge(
   return { path: "/forms/pdfengines/merge", data };
 }
 
+export function convert(
+  files: Asset[],
+  options: Partial<mergeOptions> = {}
+): RequestInfo {
+  const data = new FormData();
+
+  appendToFormData(data, options);
+
+  appendFilesToFormdata(data, files);
+
+  return { path: "/forms/pdfengines/convert", data };
+}
+
 export function executor(url: string, headers: Partial<headers> = {}) {
   return (info: RequestInfo) => {
     const reqUrl = new URL(info.path, url);
@@ -308,6 +321,17 @@ export function webhookExecutor(
     });
   };
 }
+
+export async function readFile(file: string, filename = ''): Promise<Asset> {
+  if(!filename) filename = file
+
+  return {
+    filename,
+    content: new Blob([await Deno.readFile(file)])
+  }
+}
+
+
 
 
 // export function handleZipResponse(r: Response): any[] {
