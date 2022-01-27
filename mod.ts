@@ -162,7 +162,7 @@ function appendFilesToFormdata(data: FormData, files: Asset[]) {
 
 function appendToFormData(
   f: FormData,
-  obj: Record<string, bool | duration | number | string>
+  obj: Record<string, bool | duration | number | string>,
 ) {
   Object.entries(obj).forEach(([key, value]) => {
     f.append(key, value.toString());
@@ -180,7 +180,7 @@ function appendToFormData(
 export function chromiumUrl(
   url: string,
   options: Partial<ChromiumOptions> = {},
-  files: Asset[] = []
+  files: Asset[] = [],
 ): RequestInfo {
   const data = new FormData();
 
@@ -195,15 +195,16 @@ export function chromiumUrl(
 export function chromiumHTML(
   indexHTML: Asset,
   files: Asset[] = [],
-  options: Partial<ChromiumOptions> = {}
+  options: Partial<ChromiumOptions> = {},
 ): RequestInfo {
   const data = new FormData();
 
   appendToFormData(data, options);
 
   appendFilesToFormdata(data, files);
-  if (!indexHTML.filename.endsWith("index.html"))
+  if (!indexHTML.filename.endsWith("index.html")) {
     indexHTML.filename = "index.html";
+  }
 
   appendFilesToFormdata(data, [indexHTML]);
 
@@ -213,15 +214,16 @@ export function chromiumHTML(
 export function chromiumMarkdown(
   indexHTML: Asset,
   files: Asset[] = [],
-  options: Partial<ChromiumOptions> = {}
+  options: Partial<ChromiumOptions> = {},
 ): RequestInfo {
   const data = new FormData();
 
   appendToFormData(data, options);
 
   appendFilesToFormdata(data, files);
-  if (!indexHTML.filename.endsWith("index.html"))
+  if (!indexHTML.filename.endsWith("index.html")) {
     indexHTML.filename = "index.html";
+  }
 
   appendFilesToFormdata(data, [indexHTML]);
 
@@ -230,7 +232,7 @@ export function chromiumMarkdown(
 
 export function office(
   files: Asset[] = [],
-  options: Partial<LibreOfficeOptions> = {}
+  options: Partial<LibreOfficeOptions> = {},
 ): RequestInfo {
   const data = new FormData();
 
@@ -243,7 +245,7 @@ export function office(
 
 export function merge(
   files: Asset[],
-  options: Partial<mergeOptions> = {}
+  options: Partial<mergeOptions> = {},
 ): RequestInfo {
   const data = new FormData();
 
@@ -256,7 +258,7 @@ export function merge(
 
 export function convert(
   files: Asset[],
-  options: Partial<mergeOptions> = {}
+  options: Partial<mergeOptions> = {},
 ): RequestInfo {
   const data = new FormData();
 
@@ -273,8 +275,9 @@ export function executor(url: string, headers: Partial<headers> = {}) {
 
     const extraHeaders: Record<string, string> = {};
 
-    if (headers.outputFilename)
+    if (headers.outputFilename) {
       extraHeaders["Gotenberg-Output-Filename"] = headers.outputFilename;
+    }
 
     if (headers.trace) extraHeaders["Gotenberg-Trace"] = headers.trace;
 
@@ -292,30 +295,35 @@ export function executor(url: string, headers: Partial<headers> = {}) {
 export function webhookExecutor(
   url: string,
   options: WebHookOptions,
-  headers: Partial<headers> = {}
+  headers: Partial<headers> = {},
 ) {
   return (info: RequestInfo) => {
     const reqUrl = new URL(info.path, url);
 
     const extraHeaders: Record<string, string> = {};
 
-    if (options.errorMethod)
+    if (options.errorMethod) {
       extraHeaders["Gotenberg-Webhook-Error-Method"] = options.errorMethod;
+    }
 
-    if (options.errorUrl)
+    if (options.errorUrl) {
       extraHeaders["Gotenberg-Webhook-Error-Url"] = options.errorUrl;
+    }
 
-    if (options.extraHttpHeaders)
+    if (options.extraHttpHeaders) {
       extraHeaders["Gotenberg-Webhook-Extra-Http-Headers"] =
         options.extraHttpHeaders;
+    }
 
-    if (options.method)
+    if (options.method) {
       extraHeaders["Gotenberg-Webhook-Method"] = options.method;
+    }
 
     if (options.url) extraHeaders["Gotenberg-Webhook-Url"] = options.url;
 
-    if (headers.outputFilename)
+    if (headers.outputFilename) {
       extraHeaders["Gotenberg-Output-Filename"] = headers.outputFilename;
+    }
 
     if (headers.trace) extraHeaders["Gotenberg-Trace"] = headers.trace;
 
