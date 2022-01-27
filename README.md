@@ -11,12 +11,12 @@ We provide 2 executor: `executor` and `webhookExecutor`. They get options as par
 
 All files need to be in the form of the `ASSET` object so a object with 2 fields a content field of type Blob (or subclass) and a filename (type string). We provide a helper `readFile` to simply load a file (async) from the filesystem.
 
-
+*** Most API should be clear by looking at the types of the functions! ***
 
 ## Basic example:
 
 ```ts
-import { execurtor, office, readFile } from 'https://deno.land/x/gotenberg/mod.ts'
+import { executor, office, readFile } from 'https://deno.land/x/gotenberg/mod.ts'
 
 const gotenberg = executor("http://gotenberg:3000")
 
@@ -29,4 +29,9 @@ gotenberg(
 ```
 
 ## Note
-Most of this API is created just by looking at the docs at https://gotenberg.dev/ so feel free to report any bugs or missing options!
+Most of this API is created just by looking at the docs at https://gotenberg.dev/ so feel free to report any bugs or missing options! This is a alpha version!
+
+
+## Roadmap
+- [ ] helpers for handling response (also for zip return!)
+- [ ] add tests
