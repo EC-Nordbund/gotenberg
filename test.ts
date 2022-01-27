@@ -13,7 +13,7 @@ Deno.test("Test that api is running", async () => {
   assert(t.length > 100, "Falsy response");
 });
 
-Deno.test("test chromium url", async () => {
+Deno.test("chromium/url", async () => {
   const gotenberg = executor(__API_URL__);
   const res = await gotenberg(chromiumUrl("https://www.google.de/"));
 

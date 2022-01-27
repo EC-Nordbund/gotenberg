@@ -2,12 +2,12 @@ type float = number;
 type bool = boolean;
 type duration = string;
 
-interface RequestInfo {
+export interface RequestInfo {
   data: FormData;
   path: string;
 }
 
-interface ChromiumOptions {
+export interface ChromiumOptions {
   /**
    * Paper width, in inches (default 8.5)
    */
@@ -82,7 +82,7 @@ interface ChromiumOptions {
   pdfFormat: string;
 }
 
-interface LibreOfficeOptions {
+export interface LibreOfficeOptions {
   /**
    * Set the paper orientation to landscape (default false)
    */
@@ -105,14 +105,14 @@ interface LibreOfficeOptions {
   merge: bool;
 }
 
-interface mergeOptions {
+export interface mergeOptions {
   /**
    * The PDF format of the resulting PDF
    */
   pdfFormat: string;
 }
 
-interface WebHookOptions {
+export interface WebHookOptions {
   /**
    * the callback to use
    */
@@ -135,7 +135,7 @@ interface WebHookOptions {
   extraHttpHeaders?: string;
 }
 
-interface headers {
+export interface headers {
   /**
    * The trace, or request ID, identifies a request in the logs.
 
@@ -149,7 +149,7 @@ interface headers {
   outputFilename: string;
 }
 
-type Asset = {
+export type Asset = {
   filename: string;
   content: Blob;
 };
@@ -169,6 +169,14 @@ function appendToFormData(
   });
 }
 
+/**
+ * Creates a RequestInfo for converting a webpage (url) to a pdf.
+ *
+ * @param url url that should be loaded by gotenberg
+ * @param options layout and design options
+ * @param files additional filles allways loaded into the page
+ * @returns RequestInfo to be passed to an executor
+ */
 export function chromiumUrl(
   url: string,
   options: Partial<ChromiumOptions> = {},
