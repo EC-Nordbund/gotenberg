@@ -1,3 +1,5 @@
+import { ZipReader, BlobReader, BlobWriter } from "./deps/zip.ts";
+
 type float = number;
 type bool = boolean;
 type duration = string;
@@ -162,7 +164,7 @@ function appendFilesToFormdata(data: FormData, files: Asset[]) {
 
 function appendToFormData(
   f: FormData,
-  obj: Record<string, bool | duration | number | string>,
+  obj: Record<string, bool | duration | number | string>
 ) {
   Object.entries(obj).forEach(([key, value]) => {
     f.append(key, value.toString());
@@ -180,7 +182,7 @@ function appendToFormData(
 export function chromiumUrl(
   url: string,
   options: Partial<ChromiumOptions> = {},
-  files: Asset[] = [],
+  files: Asset[] = []
 ): RequestInfo {
   const data = new FormData();
 
@@ -195,7 +197,7 @@ export function chromiumUrl(
 export function chromiumHTML(
   indexHTML: Asset,
   files: Asset[] = [],
-  options: Partial<ChromiumOptions> = {},
+  options: Partial<ChromiumOptions> = {}
 ): RequestInfo {
   const data = new FormData();
 
@@ -214,7 +216,7 @@ export function chromiumHTML(
 export function chromiumMarkdown(
   indexHTML: Asset,
   files: Asset[] = [],
-  options: Partial<ChromiumOptions> = {},
+  options: Partial<ChromiumOptions> = {}
 ): RequestInfo {
   const data = new FormData();
 
@@ -232,7 +234,7 @@ export function chromiumMarkdown(
 
 export function office(
   files: Asset[] = [],
-  options: Partial<LibreOfficeOptions> = {},
+  options: Partial<LibreOfficeOptions> = {}
 ): RequestInfo {
   const data = new FormData();
 
@@ -245,7 +247,7 @@ export function office(
 
 export function merge(
   files: Asset[],
-  options: Partial<mergeOptions> = {},
+  options: Partial<mergeOptions> = {}
 ): RequestInfo {
   const data = new FormData();
 
@@ -258,7 +260,7 @@ export function merge(
 
 export function convert(
   files: Asset[],
-  options: Partial<mergeOptions> = {},
+  options: Partial<mergeOptions> = {}
 ): RequestInfo {
   const data = new FormData();
 
@@ -295,7 +297,7 @@ export function executor(url: string, headers: Partial<headers> = {}) {
 export function webhookExecutor(
   url: string,
   options: WebHookOptions,
-  headers: Partial<headers> = {},
+  headers: Partial<headers> = {}
 ) {
   return (info: RequestInfo) => {
     const reqUrl = new URL(info.path, url);
@@ -347,12 +349,47 @@ export async function readFile(file: string, filename = ""): Promise<Asset> {
   };
 }
 
-// export function handleZipResponse(r: Response): any[] {
-//   return [];
-// }
+export async function handleZipResponse(
+  r: Response | Promise<Response>
+): Promise<Asset[]> {
+  const zipFile = await handleResponse(r);
 
-// executor("http://gotenberg:3000")(
-//   office([] as any[], {
-//     landscape: true,
-//   })
-// );
+  const reader = new ZipReader(new BlobReader(zipFile.content));
+
+  const files = await reader.getEntries();
+
+  const ret: Asset[] = [];
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+
+    ret.push({
+      filename: file.filename,
+      content: await file.getData!(new BlobWriter()),
+    });
+  }
+
+  return ret;
+}
+
+export async function handleResponse(
+  r: Response | Promise<Response>
+): Promise<Asset> {
+  const res = await r;
+
+  if (res.status !== 200 || !res.ok) {
+    const err = await res.text().catch(() => "No Error message!");
+
+    throw new Error(
+      "API responded with a status code other than 200. And error message: " +
+        err
+    );
+  }
+
+  const blob = await res.blob();
+
+  return {
+    filename: "output.pdf",
+    content: blob,
+  };
+}

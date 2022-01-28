@@ -20,7 +20,7 @@ All files need to be in the form of the `ASSET` object so a object with 2 fields
 a content field of type Blob (or subclass) and a filename (type string). We
 provide a helper `readFile` to simply load a file (async) from the filesystem.
 
-*** Most API should be clear by looking at the types of the functions! ***
+_**Most API should be clear by looking at the types of the functions!**_
 
 ## Basic example:
 
@@ -29,15 +29,18 @@ import {
   executor,
   office,
   readFile,
+  handleResponse
 } from "https://deno.land/x/gotenberg/mod.ts";
 
 const gotenberg = executor("http://gotenberg:3000");
 
-gotenberg(
-  office([readFile("./path/to/file.docx")], {
-    landscape: true,
-  }),
-);
+handleResponse(
+  gotenberg(
+    office([readFile("./path/to/file.docx")], {
+      landscape: true,
+    }),
+  )
+)
 ```
 
 ## Note
@@ -47,6 +50,6 @@ https://gotenberg.dev/ so feel free to report any bugs or missing options! This
 is a alpha version!
 
 ## Roadmap
+- [ ] documentation
 
-- [ ] helpers for handling response (also for zip return!)
-- [ ] add tests
+
