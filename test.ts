@@ -1,5 +1,5 @@
 import {
-  chromiumUrl,
+  url,
   executor,
   handleResponse,
   readFile,
@@ -30,7 +30,7 @@ async function isPDF(file: Blob) {
 Deno.test("API with returned PDF works", async () => {
   const gotenberg = executor(__API_URL__);
   const res = await handleResponse(
-    gotenberg(chromiumUrl("https://www.google.de/"))
+    gotenberg(url("https://www.google.de/"))
   );
 
   await isPDF(res.content);

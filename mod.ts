@@ -4,11 +4,17 @@ type float = number;
 type bool = boolean;
 type duration = string;
 
+/**
+ * Contains all data for the request. (Only headers and hostname are missing)
+ */
 export interface RequestInfo {
   data: FormData;
   path: string;
 }
 
+/**
+ * Options for Chromium Module
+ */
 export interface ChromiumOptions {
   /**
    * Paper width, in inches (default 8.5)
@@ -84,6 +90,9 @@ export interface ChromiumOptions {
   pdfFormat: string;
 }
 
+/**
+ * Options for LibreOffice Module
+ */
 export interface LibreOfficeOptions {
   /**
    * Set the paper orientation to landscape (default false)
@@ -107,6 +116,9 @@ export interface LibreOfficeOptions {
   merge: bool;
 }
 
+/**
+ * Options for merge Endpoint
+ */
 export interface mergeOptions {
   /**
    * The PDF format of the resulting PDF
@@ -114,6 +126,9 @@ export interface mergeOptions {
   pdfFormat: string;
 }
 
+/**
+ * Options to configure Webhook
+ */
 export interface WebHookOptions {
   /**
    * the callback to use
@@ -137,6 +152,9 @@ export interface WebHookOptions {
   extraHttpHeaders?: string;
 }
 
+/**
+ * Request headers
+ */
 export interface headers {
   /**
    * The trace, or request ID, identifies a request in the logs.
@@ -151,6 +169,9 @@ export interface headers {
   outputFilename: string;
 }
 
+/**
+ * A simple File object
+ */
 export type Asset = {
   filename: string;
   content: Blob;
@@ -179,7 +200,7 @@ function appendToFormData(
  * @param files additional filles allways loaded into the page
  * @returns RequestInfo to be passed to an executor
  */
-export function chromiumUrl(
+export function url(
   url: string,
   options: Partial<ChromiumOptions> = {},
   files: Asset[] = []
@@ -194,7 +215,15 @@ export function chromiumUrl(
   return { path: "/forms/chromium/convert/url", data };
 }
 
-export function chromiumHTML(
+/**
+ * Creates a RequestInfo for converting a html file to a pdf
+ *
+ * @param indexHTML index.html file that should be rendered to pdf
+ * @param files Additional Assets that are refrenced by indexHTML
+ * @param options layout and design options
+ * @returns ReqiestInfo to be passed to an executor
+ */
+export function html(
   indexHTML: Asset,
   files: Asset[] = [],
   options: Partial<ChromiumOptions> = {}
@@ -213,7 +242,15 @@ export function chromiumHTML(
   return { path: "/forms/chromium/convert/html", data };
 }
 
-export function chromiumMarkdown(
+/**
+ * Creates a RequestInfo for converting a html file that can import markdown to a pdf
+ *
+ * @param indexHTML index.html file that should be rendered to pdf
+ * @param files Additional Assets that are refrenced by indexHTML (including markdownfile)
+ * @param options layout and design options
+ * @returns RequestInfo to be passed to an executor
+ */
+export function markdown(
   indexHTML: Asset,
   files: Asset[] = [],
   options: Partial<ChromiumOptions> = {}
@@ -232,6 +269,13 @@ export function chromiumMarkdown(
   return { path: "/forms/chromium/convert/markdown", data };
 }
 
+/**
+ * Creates a RequestInfo for converting (near) all office files to a pdf
+ *
+ * @param files Files to be converted
+ * @param options layout and design options
+ * @returns RequestInfo to be passed to an executor
+ */
 export function office(
   files: Asset[] = [],
   options: Partial<LibreOfficeOptions> = {}
@@ -245,6 +289,13 @@ export function office(
   return { path: "/forms/libreoffice/convert", data };
 }
 
+/**
+ * Creates a RequestInfo for merging multiple pdf files
+ *
+ * @param files PDF files to be merged together
+ * @param options Merge Options
+ * @returns RequestInfo to be passed to an executor
+ */
 export function merge(
   files: Asset[],
   options: Partial<mergeOptions> = {}
@@ -258,6 +309,13 @@ export function merge(
   return { path: "/forms/pdfengines/merge", data };
 }
 
+/**
+ * Creates a RequestInfo for converting pdf files to different pdf-formats
+ *
+ * @param files PDF files to be converted
+ * @param options Convert Options
+ * @returns RequestInfo to be passed to an executor
+ */
 export function convert(
   files: Asset[],
   options: Partial<mergeOptions> = {}
@@ -271,17 +329,24 @@ export function convert(
   return { path: "/forms/pdfengines/convert", data };
 }
 
+/**
+ * Simple executor with no webhook
+ *
+ * @param url Hostname / Origin of gotenberg
+ * @param headers Options for all Request created with this executor
+ * @returns Functions that gets RequestInfo and returns a Promise of a Request
+ */
 export function executor(url: string, headers: Partial<headers> = {}) {
+  const extraHeaders: Record<string, string> = {};
+
+  if (headers.outputFilename) {
+    extraHeaders["Gotenberg-Output-Filename"] = headers.outputFilename;
+  }
+
+  if (headers.trace) extraHeaders["Gotenberg-Trace"] = headers.trace;
+
   return (info: RequestInfo) => {
     const reqUrl = new URL(info.path, url);
-
-    const extraHeaders: Record<string, string> = {};
-
-    if (headers.outputFilename) {
-      extraHeaders["Gotenberg-Output-Filename"] = headers.outputFilename;
-    }
-
-    if (headers.trace) extraHeaders["Gotenberg-Trace"] = headers.trace;
 
     return fetch(reqUrl, {
       body: info.data,
@@ -294,40 +359,48 @@ export function executor(url: string, headers: Partial<headers> = {}) {
   };
 }
 
+/**
+ * Executor with webhook
+ *
+ * @param url Hostname / Origin of gotenberg
+ * @param options Options to configure webhooks
+ * @param headers Options for all Request created with this executor
+ * @returns Functions that gets RequestInfo and returns a Promise of a Request
+ */
 export function webhookExecutor(
   url: string,
   options: WebHookOptions,
   headers: Partial<headers> = {}
 ) {
+  const extraHeaders: Record<string, string> = {};
+
+  if (options.errorMethod) {
+    extraHeaders["Gotenberg-Webhook-Error-Method"] = options.errorMethod;
+  }
+
+  if (options.errorUrl) {
+    extraHeaders["Gotenberg-Webhook-Error-Url"] = options.errorUrl;
+  }
+
+  if (options.extraHttpHeaders) {
+    extraHeaders["Gotenberg-Webhook-Extra-Http-Headers"] =
+      options.extraHttpHeaders;
+  }
+
+  if (options.method) {
+    extraHeaders["Gotenberg-Webhook-Method"] = options.method;
+  }
+
+  if (options.url) extraHeaders["Gotenberg-Webhook-Url"] = options.url;
+
+  if (headers.outputFilename) {
+    extraHeaders["Gotenberg-Output-Filename"] = headers.outputFilename;
+  }
+
+  if (headers.trace) extraHeaders["Gotenberg-Trace"] = headers.trace;
+
   return (info: RequestInfo) => {
     const reqUrl = new URL(info.path, url);
-
-    const extraHeaders: Record<string, string> = {};
-
-    if (options.errorMethod) {
-      extraHeaders["Gotenberg-Webhook-Error-Method"] = options.errorMethod;
-    }
-
-    if (options.errorUrl) {
-      extraHeaders["Gotenberg-Webhook-Error-Url"] = options.errorUrl;
-    }
-
-    if (options.extraHttpHeaders) {
-      extraHeaders["Gotenberg-Webhook-Extra-Http-Headers"] =
-        options.extraHttpHeaders;
-    }
-
-    if (options.method) {
-      extraHeaders["Gotenberg-Webhook-Method"] = options.method;
-    }
-
-    if (options.url) extraHeaders["Gotenberg-Webhook-Url"] = options.url;
-
-    if (headers.outputFilename) {
-      extraHeaders["Gotenberg-Output-Filename"] = headers.outputFilename;
-    }
-
-    if (headers.trace) extraHeaders["Gotenberg-Trace"] = headers.trace;
 
     return fetch(reqUrl, {
       body: info.data,
@@ -340,6 +413,13 @@ export function webhookExecutor(
   };
 }
 
+/**
+ * Helper to read a file (async)
+ *
+ * @param file Path to file
+ * @param filename filename passed to gotenberg
+ * @returns Asset that can be used in RequestInfo creatoren
+ */
 export async function readFile(file: string, filename = ""): Promise<Asset> {
   if (!filename) filename = file;
 
@@ -349,6 +429,12 @@ export async function readFile(file: string, filename = ""): Promise<Asset> {
   };
 }
 
+/**
+ * Response handler to handle responses that are a zip file
+ *
+ * @param r Response or Promise of Response to the Request to the gotenberg API
+ * @returns All files in the zip Archive are extracted to the Asset data-type
+ */
 export async function handleZipResponse(
   r: Response | Promise<Response>
 ): Promise<Asset[]> {
@@ -372,6 +458,14 @@ export async function handleZipResponse(
   return ret;
 }
 
+/**
+ * Response handler to handle responses that are a pdf file
+ *
+ * **_NOTE: if used for a response that returns a zip file you might encounter errors in your code as this function assumes you know that you don't get a zip file_**
+ *
+ * @param r Response or Promise of Response to the Request to the gotenberg API
+ * @returns Asset file
+ */
 export async function handleResponse(
   r: Response | Promise<Response>
 ): Promise<Asset> {

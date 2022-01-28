@@ -1,26 +1,20 @@
 # Gotenberg Deno Client
 
-> This is a WIP client implementation until version 1.0 api breaking changes can
-> happen!
-
 ## API
 
-For each Endpoint we provide a custom function they are calles: `chromiumUrl`,
-`chromiumHTML`, `chromiumMarkdown`, `office`, `merge`, `convert`
+We have 4 types of exported functions:
 
-Each function get as parameters all data needed to execute THIS request and
-returns a `RequestInfo` object. This can be passed to an executor.
+1. File-Loader helper (`readFile`)
+2. `RequestInfo` creator (`office`, `merge`, `convert`, `url`, `markdown`, `url`)
+3. Executoren (`executor`, `webhookExecutor`)
+4. Response handler (`handleZipResponse`, `handleResponse`)
 
-We provide 2 executor: `executor` and `webhookExecutor`. They get options as
-parameters that are Request undependend so only request-header fields. They
-return a function that gets a `RequestInfo` object and return a Promise of a
-Response object.
+To create a request:
+1. create a (global) execcutor wich can be used for multiple requests (we provide 2 one with webhook options). You might use multiple executoren in your project!
+2. create the RequestInfo object by calling the corresponding function depending on your use case.
+3. pass the RequestInfo to the executor it returns a `Promise<Response>`.
+4. pass the Promise (or the Response) to one of the response handler. If you expect more than one pdf file use `handleZipResponse`. If you expect a single PDF use `handleResponse`
 
-All files need to be in the form of the `ASSET` object so a object with 2 fields
-a content field of type Blob (or subclass) and a filename (type string). We
-provide a helper `readFile` to simply load a file (async) from the filesystem.
-
-_**Most API should be clear by looking at the types of the functions!**_
 
 ## Basic example:
 
@@ -34,7 +28,7 @@ import {
 
 const gotenberg = executor("http://gotenberg:3000");
 
-handleResponse(
+const { filename, content } = await handleResponse(
   gotenberg(
     office([readFile("./path/to/file.docx")], {
       landscape: true,
@@ -43,13 +37,5 @@ handleResponse(
 )
 ```
 
-## Note
-
-Most of this API is created just by looking at the docs at
-https://gotenberg.dev/ so feel free to report any bugs or missing options! This
-is a alpha version!
-
-## Roadmap
-- [ ] documentation
-
-
+## API Documentation
+The generated API documentaion you can find here: https://doc.deno.land/https://deno.land/x/gotenberg/mod.ts
