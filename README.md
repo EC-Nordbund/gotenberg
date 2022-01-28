@@ -36,7 +36,7 @@ const gotenberg = executor("http://gotenberg:3000");
 
 const { filename, content } = await handleResponse(
   gotenberg(
-    office([readFile("./path/to/file.docx")], {
+    office([await readFile("./path/to/file.docx")], {
       landscape: true,
     }),
   ),
