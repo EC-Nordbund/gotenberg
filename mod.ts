@@ -1,4 +1,4 @@
-import { ZipReader, BlobReader, BlobWriter } from "./deps/zip.ts";
+import { BlobReader, BlobWriter, ZipReader } from "./deps/zip.ts";
 
 type float = number;
 type bool = boolean;
@@ -185,7 +185,7 @@ function appendFilesToFormdata(data: FormData, files: Asset[]) {
 
 function appendToFormData(
   f: FormData,
-  obj: Record<string, bool | duration | number | string>
+  obj: Record<string, bool | duration | number | string>,
 ) {
   Object.entries(obj).forEach(([key, value]) => {
     f.append(key, value.toString());
@@ -203,7 +203,7 @@ function appendToFormData(
 export function url(
   url: string,
   options: Partial<ChromiumOptions> = {},
-  files: Asset[] = []
+  files: Asset[] = [],
 ): RequestInfo {
   const data = new FormData();
 
@@ -226,7 +226,7 @@ export function url(
 export function html(
   indexHTML: Asset,
   files: Asset[] = [],
-  options: Partial<ChromiumOptions> = {}
+  options: Partial<ChromiumOptions> = {},
 ): RequestInfo {
   const data = new FormData();
 
@@ -253,7 +253,7 @@ export function html(
 export function markdown(
   indexHTML: Asset,
   files: Asset[] = [],
-  options: Partial<ChromiumOptions> = {}
+  options: Partial<ChromiumOptions> = {},
 ): RequestInfo {
   const data = new FormData();
 
@@ -278,7 +278,7 @@ export function markdown(
  */
 export function office(
   files: Asset[] = [],
-  options: Partial<LibreOfficeOptions> = {}
+  options: Partial<LibreOfficeOptions> = {},
 ): RequestInfo {
   const data = new FormData();
 
@@ -298,7 +298,7 @@ export function office(
  */
 export function merge(
   files: Asset[],
-  options: Partial<mergeOptions> = {}
+  options: Partial<mergeOptions> = {},
 ): RequestInfo {
   const data = new FormData();
 
@@ -318,7 +318,7 @@ export function merge(
  */
 export function convert(
   files: Asset[],
-  options: Partial<mergeOptions> = {}
+  options: Partial<mergeOptions> = {},
 ): RequestInfo {
   const data = new FormData();
 
@@ -370,7 +370,7 @@ export function executor(url: string, headers: Partial<headers> = {}) {
 export function webhookExecutor(
   url: string,
   options: WebHookOptions,
-  headers: Partial<headers> = {}
+  headers: Partial<headers> = {},
 ) {
   const extraHeaders: Record<string, string> = {};
 
@@ -436,7 +436,7 @@ export async function readFile(file: string, filename = ""): Promise<Asset> {
  * @returns All files in the zip Archive are extracted to the Asset data-type
  */
 export async function handleZipResponse(
-  r: Response | Promise<Response>
+  r: Response | Promise<Response>,
 ): Promise<Asset[]> {
   const zipFile = await handleResponse(r);
 
@@ -467,7 +467,7 @@ export async function handleZipResponse(
  * @returns Asset file
  */
 export async function handleResponse(
-  r: Response | Promise<Response>
+  r: Response | Promise<Response>,
 ): Promise<Asset> {
   const res = await r;
 
@@ -476,7 +476,7 @@ export async function handleResponse(
 
     throw new Error(
       "API responded with a status code other than 200. And error message: " +
-        err
+        err,
     );
   }
 

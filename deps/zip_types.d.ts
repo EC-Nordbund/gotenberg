@@ -17,7 +17,7 @@ interface ConfigurationOptions {
 
 export function initShimAsyncCodec(
   constructor: object,
-  constructorOptions?: any
+  constructorOptions?: any,
 ): { Deflate: Codec; Inflate: Codec };
 
 export function terminateWorkers(): void;
@@ -157,17 +157,18 @@ export class ZipWriter {
   public add(
     name: string,
     reader: Reader | null,
-    options?: ZipWriterAddDataOptions
+    options?: ZipWriterAddDataOptions,
   ): Promise<Entry>;
   public close(
     comment?: Uint8Array,
-    options?: ZipWriterCloseOptions
+    options?: ZipWriterCloseOptions,
   ): Promise<any>;
 }
 
-type ZipWriterAddDataOptions = EntryDataOnprogressOption &
-  AddDataOptions &
-  ZipWriterConstructorOptions;
+type ZipWriterAddDataOptions =
+  & EntryDataOnprogressOption
+  & AddDataOptions
+  & ZipWriterConstructorOptions;
 
 type ZipWriterCloseOptions = EntryOnprogressOption & CloseOptions;
 
@@ -230,7 +231,7 @@ export interface ZipFileEntry extends ZipEntry {
   getBlob(mimeType?: string, options?: EntryGetDataOptions): Promise<Blob>;
   getData64URI(
     mimeType?: string,
-    options?: EntryGetDataOptions
+    options?: EntryGetDataOptions,
   ): Promise<string>;
   getUint8Array(options?: EntryGetDataOptions): Promise<Uint8Array>;
   getData(writer: Writer, options?: EntryGetDataOptions): Promise<any>;
@@ -254,35 +255,37 @@ export interface ZipDirectoryEntry extends ZipEntry {
   addHttpContent(
     name: string,
     url: string,
-    options?: HttpOptions
+    options?: HttpOptions,
   ): ZipFileEntry;
   addFileSystemEntry(fileSystemEntry: FileSystemEntry): Promise<ZipEntry>;
   importBlob(blob: Blob, options?: ZipReaderConstructorOptions): Promise<void>;
   importData64URI(
     dataURI: string,
-    options?: ZipReaderConstructorOptions
+    options?: ZipReaderConstructorOptions,
   ): Promise<void>;
   importUint8Array(
     array: Uint8Array,
-    options?: ZipReaderConstructorOptions
+    options?: ZipReaderConstructorOptions,
   ): Promise<void>;
   importHttpContent(
     url: string,
-    options?: ZipDirectoryEntryImportHttpOptions
+    options?: ZipDirectoryEntryImportHttpOptions,
   ): Promise<void>;
   exportBlob(options?: ZipDirectoryEntryExportOptions): Promise<Blob>;
   exportData64URI(options?: ZipDirectoryEntryExportOptions): Promise<string>;
   exportUint8Array(
-    options?: ZipDirectoryEntryExportOptions
+    options?: ZipDirectoryEntryExportOptions,
   ): Promise<Uint8Array>;
 }
 
-type ZipDirectoryEntryImportHttpOptions = ZipReaderConstructorOptions &
-  HttpOptions;
+type ZipDirectoryEntryImportHttpOptions =
+  & ZipReaderConstructorOptions
+  & HttpOptions;
 
-type ZipDirectoryEntryExportOptions = EntryDataOnprogressOption &
-  ExportOptions &
-  ZipWriterConstructorOptions;
+type ZipDirectoryEntryExportOptions =
+  & EntryDataOnprogressOption
+  & ExportOptions
+  & ZipWriterConstructorOptions;
 
 export interface FS extends ZipDirectoryEntry {
   root: ZipDirectoryEntry;

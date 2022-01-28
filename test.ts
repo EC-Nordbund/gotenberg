@@ -1,10 +1,10 @@
 import {
-  url,
   executor,
   handleResponse,
-  readFile,
   handleZipResponse,
   office,
+  readFile,
+  url,
 } from "./mod.ts";
 import { assert } from "https://deno.land/std@0.121.0/testing/asserts.ts";
 
@@ -30,7 +30,7 @@ async function isPDF(file: Blob) {
 Deno.test("API with returned PDF works", async () => {
   const gotenberg = executor(__API_URL__);
   const res = await handleResponse(
-    gotenberg(url("https://www.google.de/"))
+    gotenberg(url("https://www.google.de/")),
   );
 
   await isPDF(res.content);
