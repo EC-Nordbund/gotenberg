@@ -1,3 +1,4 @@
+// deno-lint-ignore-file
 export function configure(configuration: ConfigurationOptions): void;
 
 type FileSystemEntry = any;
